@@ -1,0 +1,3 @@
+yarn run lint-staged
+yarn format:fix
+yarn test:unit

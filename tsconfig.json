@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "incremental": false,
+    "target": "es2022",
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "declarationMap": false,
+    "declaration": false,
+    "resolveJsonModule": true,
+    "sourceMap": false,
+    "outDir": "./dist",
+    "forceConsistentCasingInFileNames": true,
+    /* Type Checking */
+    "strict": true,
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@tests/*": ["./tests/*"]
+    }
+  }
+}
