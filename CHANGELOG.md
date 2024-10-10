@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3](https://github.com/i-am-bee/bee-observe-connector/compare/v0.0.2...v0.0.3) (2024-10-10)
+
+
+### Features
+
+* **framework:** increase fw version ([e3a2702](https://github.com/i-am-bee/bee-observe-connector/commit/e3a270223063c96cefc55bfe24811f271d05d0ed))
+
 ## 0.0.2 (2024-10-09)
 
 ### Features
