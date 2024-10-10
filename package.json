@@ -22,6 +22,7 @@
     "coverage": "vitest run --coverage",
     "ts:check": "tsc --noEmit",
     "start:infra": "docker compose -f ./infra/compose.yml up -d",
+    "stop:infra": "docker compose -f ./infra/compose.yml down",
     "generate:schema": "bash ./scripts/generate-schema.sh"
   },
   "devDependencies": {
@@ -34,7 +35,7 @@
     "@types/eslint": "^9",
     "@types/node": "^22.5.0",
     "@vitest/coverage-v8": "^2.0.5",
-    "bee-agent-framework": "^0.0.26",
+    "bee-agent-framework": "^0.0.27",
     "eslint": "^9.9.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
@@ -57,7 +58,7 @@
     "openapi-fetch": "^0.11.1"
   },
   "peerDependencies": {
-    "bee-agent-framework": "^0.0.26"
+    "bee-agent-framework": ">=0.0.27 <0.1.0"
   },
   "files": [
     "dist/**/*"
