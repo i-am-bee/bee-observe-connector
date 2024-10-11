@@ -88,6 +88,8 @@ export function createObserveConnector(config: ConnectorConfig) {
     const finishEventName: keyof GenerateCallbacks = `finish`;
     const startEventName: keyof GenerateCallbacks = `start`;
 
+    const onNewTokenMap = new Map<string, number>();
+
     /**
      * This block sends the collected data to the Observe API
      * The created trace response can be processed using the provided callback function
@@ -189,14 +191,19 @@ export function createObserveConnector(config: ConnectorConfig) {
         startedAt: meta.createdAt
       });
 
-      if (
-        spans.length > 1 &&
-        spans.at(-1)?.attributes.target === meta.path &&
-        meta.path.includes(newTokenEventName)
-      ) {
-        spans[spans.length - 1] = span;
-      } else {
-        spans.push(span);
+      const lastIteration = groupIterations[groupIterations.length - 1];
+
+      // delete the `newToken` event if exists and create the new one
+      const iterationOnNewTokenIndex = onNewTokenMap.get(lastIteration);
+      if (iterationOnNewTokenIndex && meta.name === newTokenEventName) {
+        spans.splice(iterationOnNewTokenIndex, 1);
+      }
+
+      spans.push(span);
+
+      // save the last `newToken` event for each iteration
+      if (meta.name === newTokenEventName && groupIterations.length > 0) {
+        onNewTokenMap.set(lastIteration, spans.length - 1);
       }
     });
 
