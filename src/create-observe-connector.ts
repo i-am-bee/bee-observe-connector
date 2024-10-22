@@ -234,11 +234,11 @@ export function createObserveConnector(config: ConnectorConfig) {
         spansMap.delete(lastIterationOnNewTokenSpanId);
       }
 
-      // delete the last `partialUpdate` || 'update' event if the new one has same data and the original one does not have nested spans
+      // delete the last `partialUpdate` event if the new one has same data and the original one does not have nested spans
       const lastIterationEventSpanId = eventsIterationsMap.get(lastIteration)?.get(meta.name);
       if (
         lastIterationEventSpanId &&
-        ([partialUpdateEventName, updateEventName] as string[]).includes(meta.name) &&
+        ([partialUpdateEventName] as string[]).includes(meta.name) &&
         spansMap.has(lastIterationEventSpanId)
       ) {
         const { attributes, context } = spansMap.get(lastIterationEventSpanId)!;
