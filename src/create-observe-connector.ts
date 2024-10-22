@@ -37,6 +37,7 @@ import { BeeAgent } from 'bee-agent-framework/agents/bee/agent';
 import { Version } from 'bee-agent-framework';
 import { Version as ConnectorVersion } from './version.js';
 import { ChatLLM } from 'bee-agent-framework/llms/chat';
+import { isDeepEqual } from 'remeda';
 
 const SIGNAL_TIMEOUT_DEFAULT = 10000;
 
@@ -76,7 +77,10 @@ export function createObserveConnector(config: ConnectorConfig) {
     } = context;
     const basePath = emitter.namespace.join('.');
 
-    const spans: Span[] = [];
+    const spansMap = new Map<string, Span>();
+    const parentIdsMap = new Map<string, number>();
+    const spansToDeleteMap = new Map<string, undefined>();
+
     let generatedMessage: TraceRequestBody['response'] | undefined = undefined;
     let history: { content: string; role: string }[] | undefined = undefined;
     const groupIterations: string[] = [];
@@ -84,11 +88,39 @@ export function createObserveConnector(config: ConnectorConfig) {
     const idNameManager = new IdNameManager();
 
     const newTokenEventName: keyof GenerateCallbacks = `newToken`;
+    const partialUpdateEventName: keyof BeeCallbacks = 'partialUpdate';
+    const updateEventName: keyof BeeCallbacks = 'update';
     const successEventName: keyof GenerateCallbacks = `success`;
     const finishEventName: keyof GenerateCallbacks = `finish`;
     const startEventName: keyof GenerateCallbacks = `start`;
 
-    const onNewTokenMap = new Map<string, number>();
+    const eventsIterationsMap = new Map<string, Map<string, string>>();
+
+    /**
+     * delete all sources related to deleted span
+     * @param param0
+     * @returns
+     */
+    function cleanSpanSources({ spanId }: { spanId: string }) {
+      const parentId = spansMap.get(spanId)?.parent_id;
+      if (!parentId) return;
+
+      const spanCount = parentIdsMap.get(parentId);
+      if (!spanCount) return;
+
+      if (spanCount > 1) {
+        // increase the span count for the parentId
+        parentIdsMap.set(parentId, spanCount - 1);
+      } else if (spanCount === 1) {
+        // delete the parentId from the map
+        parentIdsMap.delete(parentId);
+        // check the `spansToDelete` if the span should be deleted when it has no children's
+        if (spansToDeleteMap.has(parentId)) {
+          spansMap.delete(parentId);
+          spansToDeleteMap.delete(parentId);
+        }
+      }
+    }
 
     /**
      * This block sends the collected data to the Observe API
@@ -100,7 +132,7 @@ export function createObserveConnector(config: ConnectorConfig) {
         try {
           const responseData = await observeApiCircuitBreaker.getRunner(sendTrace)({
             body: {
-              spans,
+              spans: Array.from(spansMap.values()),
               request: {
                 message:
                   prompt ??
@@ -159,7 +191,8 @@ export function createObserveConnector(config: ConnectorConfig) {
        * I use only the top-level groups like iterations other nested groups like tokens would introduce unuseful complexity
        */
       if (meta.groupId && !meta.trace.parentRunId && !groupIterations.includes(meta.groupId)) {
-        spans.push(
+        spansMap.set(
+          meta.groupId,
           createSpan({
             id: meta.groupId,
             name: meta.groupId,
@@ -194,16 +227,47 @@ export function createObserveConnector(config: ConnectorConfig) {
       const lastIteration = groupIterations[groupIterations.length - 1];
 
       // delete the `newToken` event if exists and create the new one
-      const iterationOnNewTokenIndex = onNewTokenMap.get(lastIteration);
-      if (iterationOnNewTokenIndex && meta.name === newTokenEventName) {
-        spans.splice(iterationOnNewTokenIndex, 1);
+      const lastIterationOnNewTokenSpanId = eventsIterationsMap.get(lastIteration)?.get(meta.name);
+      if (lastIterationOnNewTokenSpanId && meta.name === newTokenEventName) {
+        // delete span
+        cleanSpanSources({ spanId: lastIterationOnNewTokenSpanId });
+        spansMap.delete(lastIterationOnNewTokenSpanId);
       }
 
-      spans.push(span);
+      // delete the last `partialUpdate` || 'update' event if the new one has same data and the original one does not have nested spans
+      const lastIterationEventSpanId = eventsIterationsMap.get(lastIteration)?.get(meta.name);
+      if (
+        lastIterationEventSpanId &&
+        ([partialUpdateEventName, updateEventName] as string[]).includes(meta.name) &&
+        spansMap.has(lastIterationEventSpanId)
+      ) {
+        const { attributes, context } = spansMap.get(lastIterationEventSpanId)!;
 
-      // save the last `newToken` event for each iteration
-      if (meta.name === newTokenEventName && groupIterations.length > 0) {
-        onNewTokenMap.set(lastIteration, spans.length - 1);
+        if (isDeepEqual(serializedData, attributes.data)) {
+          if (parentIdsMap.has(context.span_id)) {
+            spansToDeleteMap.set(lastIterationEventSpanId, undefined);
+          } else {
+            // delete span
+            cleanSpanSources({ spanId: lastIterationEventSpanId });
+            spansMap.delete(lastIterationEventSpanId);
+          }
+        }
+      }
+
+      // create new span
+      spansMap.set(span.context.span_id, span);
+      // update number of nested spans for parent_id if exists
+      if (span.parent_id) {
+        parentIdsMap.set(span.parent_id, (parentIdsMap.get(span.parent_id) || 0) + 1);
+      }
+
+      // save the last event for each iteration
+      if (groupIterations.length > 0) {
+        if (eventsIterationsMap.has(lastIteration)) {
+          eventsIterationsMap.get(lastIteration)!.set(meta.name, span.context.span_id);
+        } else {
+          eventsIterationsMap.set(lastIteration, new Map().set(meta.name, span.context.span_id));
+        }
       }
     });
 
@@ -242,7 +306,8 @@ export function createObserveConnector(config: ConnectorConfig) {
             groupId: meta.groupId
           });
 
-          spans.push(
+          spansMap.set(
+            spanId,
             createSpan({
               id: spanId,
               name: `${meta.name}Custom`,

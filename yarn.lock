@@ -2171,6 +2171,7 @@ __metadata:
     openapi-typescript: "npm:^7.3.0"
     prettier: "npm:^3.3.3"
     release-it: "npm:^17.6.0"
+    remeda: "npm:^2.15.2"
     rimraf: "npm:^6.0.1"
     tsup: "npm:^8.2.4"
     tsx: "npm:^4.18.0"
@@ -7346,6 +7347,15 @@ __metadata:
   dependencies:
     type-fest: "npm:^4.26.1"
   checksum: 10c0/a1e6693be8e57fd16ffd49873356387f3227550d3c60a6ec90d9f3798f5830abb007d0a2834a4ee7b9c6bdf56a118444537fcc922fada98aa0aadc0587a92fff
+  languageName: node
+  linkType: hard
+
+"remeda@npm:^2.15.2":
+  version: 2.15.2
+  resolution: "remeda@npm:2.15.2"
+  dependencies:
+    type-fest: "npm:^4.26.1"
+  checksum: 10c0/0ce92b80862c9cb03a0d08595d51d94e6314ce13f8df9adc04e7a8449cff4d6ec462a0596dcbecea504289ec7910bf9d6513bdb1b5fb41b7602733e4f1d93b14
   languageName: node
   linkType: hard
 
