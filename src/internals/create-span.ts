@@ -41,8 +41,8 @@ export function createSpan({
     name: name,
     attributes: {
       target,
-      data,
-      ctx
+      data: { ...data },
+      ctx: { ...ctx }
     },
     context: {
       span_id: id
