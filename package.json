@@ -55,7 +55,8 @@
     "vitest": "^2.0.5"
   },
   "dependencies": {
-    "openapi-fetch": "^0.11.1"
+    "openapi-fetch": "^0.11.1",
+    "remeda": "^2.15.2"
   },
   "peerDependencies": {
     "bee-agent-framework": ">=0.0.27 <0.1.0"
