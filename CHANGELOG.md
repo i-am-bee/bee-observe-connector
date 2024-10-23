@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.0.5](https://github.com/i-am-bee/bee-observe-connector/compare/v0.0.2...v0.0.5) (2024-10-23)
+
+
+### Features
+
+* **framework:** increase fw version ([e3a2702](https://github.com/i-am-bee/bee-observe-connector/commit/e3a270223063c96cefc55bfe24811f271d05d0ed))
+* remove duplicated token events ([5a87a57](https://github.com/i-am-bee/bee-observe-connector/commit/5a87a57468cb8066399f115f71377a94fc6cbda8))
+* **span:** remove duplicity events from tree ([#3](https://github.com/i-am-bee/bee-observe-connector/issues/3)) ([46cb19e](https://github.com/i-am-bee/bee-observe-connector/commit/46cb19e1e6cc57df9f1f6d9710a28219df113cba))
+
 ## [0.0.4](https://github.com/i-am-bee/bee-observe-connector/compare/v0.0.2...v0.0.4) (2024-10-11)
 
 ### Features
