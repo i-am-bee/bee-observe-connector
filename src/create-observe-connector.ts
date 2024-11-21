@@ -58,10 +58,9 @@ interface ConnectorConfig {
   };
   /**
    * Callback provides the output of the Observe API send request operation.
-   * It is trigged when the agent finish the run method and send data to the API
+   * It is triggered when the agent finish the run method and send data to the API
    */
-  // cb: (error: Error | undefined, data?: TraceRespnose) => Promise<void>;
-  cb: {
+  cb?: {
     (error: ObserveError, data: undefined): Promise<void>;
     (error: undefined, data: TraceResponse): Promise<void>;
   };
@@ -166,9 +165,9 @@ export function createObserveConnector(config: ConnectorConfig) {
             }),
             ignored_keys: config.api.ignored_keys || []
           });
-          await config.cb(undefined, responseData);
+          await config.cb?.(undefined, responseData);
         } catch (error) {
-          await config.cb(ObserveError.ensure(error), undefined);
+          await config.cb?.(ObserveError.ensure(error), undefined);
         }
       }
     );
