@@ -38,25 +38,25 @@ This package allows you to easily join the [**Bee Agent Framework**](https://git
 
 ### Installation
 
-```
+```bash
 npm install bee-observe-connector
 ```
 
 or
 
-```
+```bash
 yarn add bee-observe-connector
 ```
 
 ### Usage
 
-```
+```typescript
 import { BeeAgent } from "bee-agent-framework/agents/bee/agent";
 import { OllamaChatLLM } from "bee-agent-framework/adapters/ollama/chat";
 import { TokenMemory } from "bee-agent-framework/memory/tokenMemory";
 import { DuckDuckGoSearchTool } from "bee-agent-framework/tools/search/duckDuckGoSearch";
 import { OpenMeteoTool } from "bee-agent-framework/tools/weather/openMeteo";
-import { createObserveConnector } from "@peri/bee-observe-connector";
+import { createObserveConnector } from "bee-observe-connector";
 
 const llm = new OllamaChatLLM(); // default is llama3.1 (8B), it is recommended to use 70B model
 
@@ -112,7 +112,7 @@ For more information about Agent setting see the [Bee Agent Framework](https://g
 1. Clone the repository:
 
 ```
-git clone git@github.ibm.com:Incubation/bee-observe-connector.git
+git clone git@github.com:i-am-bee/bee-observe-connector.git
 cd bee-observe-connector
 ```
 
