@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.6](https://github.com/i-am-bee/bee-observe-connector/compare/v0.0.5...v0.0.6) (2024-11-21)
+
+
+### Features
+
+* make cb optional ([d129c39](https://github.com/i-am-bee/bee-observe-connector/commit/d129c3994086373f5123cd8ea6c3032595c14cc9))
+
 ## [0.0.5](https://github.com/i-am-bee/bee-observe-connector/compare/v0.0.2...v0.0.5) (2024-10-23)
 
 
